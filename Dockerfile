@@ -1,11 +1,21 @@
-# First stage: Build the application
-FROM golang:1.17 AS builder
-WORKDIR /go/src/app
-COPY . .
-RUN go get -d -v ./...
-RUN go install -v ./...
+# Stage 1: creating a text file and writing text to it
+FROM alpine AS builder
 
-# Second stage: Run the application
-FROM gcr.io/distroless/base-debian10
-COPY --from=builder /go/bin/app /usr/local/bin/app
-ENTRYPOINT ["app"]
+WORKDIR /build
+
+RUN echo "Hello, World!" > message.txt
+
+
+# Stage 2: copying the text file from the builder stage and print the text
+FROM alpine
+
+WORKDIR /app
+
+COPY --from=builder /build/message.txt .
+
+CMD cat message.txt
+
+
+
+
+
